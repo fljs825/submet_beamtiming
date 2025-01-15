@@ -4,7 +4,7 @@
 # Quick Example
 ```
 git clone https://github.com/fljs825/submet_beamtiming.git/
-cd beamtiming
+cd submet_beamtiming
 root -l example.C // You should modify the path to the directory that contains root files.
 ```
 # Manual
