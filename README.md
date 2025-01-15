@@ -37,10 +37,10 @@ root -l example.C // You should modify the path to the directory that contains r
    ```
    for (int i = 0; i < bt.GetNbeams(); i++) {
       std::cout << "iBeams : " << i
-      << " | counts : " << counts . at(i)
-      << " | arising : " << arisings . at(i)
-      << " | peak timing : " << timings . at(i)
-      << " | falling : " << fallings.at(i)
+      << " | counts : " << bt.GetCounts() . at(i)
+      << " | arising : " << bt.GetArisings() . at(i)
+      << " | peak timing : " << bt.GetTimings() . at(i)
+      << " | falling : " << bt.GetFallings().at(i)
       << std::endl;
    }
    ```
