@@ -3,7 +3,7 @@
 
 # Quick Example
 ```
-git clone https://github.com/fljs825/submet_ana.git/
+git clone https://github.com/fljs825/submet_beamtiming.git/
 cd beamtiming
 root -l example.C // You should modify the path to the directory that contains root files.
 ```
