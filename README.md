@@ -1,11 +1,11 @@
 # Requirement
 1. ROOT
 
-# Quick Manual (Execute example file)
+# Quick Example
 ```
 git clone https://github.com/fljs825/submet_ana.git/
 cd beamtiming
-root -l example.C
+root -l example.C // You should modify the path to the directory
 ```
 # Manual
 1. Clone `BeamTiming.C` and `BeamTiming.h`
