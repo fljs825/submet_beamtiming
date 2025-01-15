@@ -9,7 +9,7 @@ root -l example.C // You should modify the path to the directory that contains r
 ```
 # Manual
 1. Clone `BeamTiming.C` and `BeamTiming.h`
-2. Create a new C script. (Namely, `vi test.C`)
+2. Create a new C++ script. (Namely, `vi test.C`)
 3. In test.C,
    ```
    #include "BeamTiming.C"
