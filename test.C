@@ -14,15 +14,16 @@ void test() {
 		if (irun >= 10) { dir = Form("./r000%i", irun); }
 
 		////////////////////////////////////////////////////////////////////////////////////////////
-		// GetBeamTimings(TString directory, const int filetype, const int threshold, const int width, bool image);
+		// GetBeamTimings(TString directory, const int filetype, const int threshold, bool image);
 		// filetype == 0 : previous version tree												  
 		// filetype == 1 : recent version tree (pulse-based)												  
 		// filetype == 2 : recent version tree (event-based)									  
-		// default threshold == 1 : recommended threshold range 0.5 < threshold < 1.5			  
+		// default threshold == 3 : recommended threshold range 1 <= threshold <= 5			  
 		// bool image == true : save beam timing finder result as a png file.					  
 		// bool image == false : not save beam timing finder result								  
 		////////////////////////////////////////////////////////////////////////////////////////////
-		bt.GetBeamTimings(dir, 1, 1, true);
+		//bt.SetNsigma(5); // Set broadness of the beam time range. Default : 5
+		bt.GetBeamTimings(dir, 1, 3, true);
 		
 		////////////////////////////////////////////////////////////////////////////////////////////
 		// bt.GetNbeams() returns the number of discovered beams.

@@ -58,8 +58,8 @@ void BeamTiming::GetBeamTimings(TString dir, const int filetype, double threshol
 	TString rundir = dir(dir.Length() - 6, dir.Length());
 	std::cout << "Now processing " << rundir << std::endl;
 
-	TH1D *h1 = new TH1D("h1", "The number of large pulses at time t;time (TDC); counts", 1024 / 8, 0, 4096);
-	TH1D *h1_diff = new TH1D("h1_diff", "h1_diff;time (TDC); counts", 1024 / 8, 0, 4096);
+	TH1D *h1 = new TH1D("h1", "The number of large pulses at time t;time (TDC); counts", 4096 / 2, 0, 4096);
+	TH1D *h1_diff = new TH1D("h1_diff", "h1_diff;time (TDC); counts", 4096 / 2, 0, 4096);
 	h1 -> SetStats(0);
 	h1_diff -> SetStats(0);
 
@@ -88,7 +88,7 @@ void BeamTiming::GetBeamTimings(TString dir, const int filetype, double threshol
 					if ( filetype == 2 ) { tree = (TTree *) input -> Get("tree"); }
 					if ( !tree ) { badtrees += TString::Format("%s ", filename.Data()); break; }
 
-					TH1D *h1_temp = new TH1D("h1_temp", "h1_temp;time (TDC); counts", 1024 / 8, 0, 4096);
+					TH1D *h1_temp = new TH1D("h1_temp", "h1_temp;time (TDC); counts", 4096 / 2 , 0, 4096);
 					if ( filetype == 0 ) { tree -> Draw("ZCtime1 >> h1_temp", cut); }
 					if ( filetype == 1 ) { tree -> Draw("istime >> h1_temp", cut); }
 					if ( filetype == 2 ) { 
@@ -101,7 +101,7 @@ void BeamTiming::GetBeamTimings(TString dir, const int filetype, double threshol
 					h1 -> Add(h1_temp);
 
 					delete h1_temp;
-					delete tree;	
+					delete tree;
 				}
 				delete input;
 				c1 -> Clear();
@@ -110,14 +110,14 @@ void BeamTiming::GetBeamTimings(TString dir, const int filetype, double threshol
 			std::cout << "Ignoring " << badtrees.Data() << std::endl;
 		}
 	}
-//	}
 
-	///////////////////////////////////////////////////////////////////////
-	// Get RMS value of the histogram and fill differentiated histogram
-	///////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////
+	// Get RMS value of the differentiated histogram and fill differentiated histogram
+	/////////////////////////////////////////////////////////////////////////////////////
 	int maxbin = h1 -> GetNbinsX();
 	double x1, x2, y1, y2, dx, dy, rms = 0;
 	timings.push_back(0);
+	counts.push_back(0);
 	for (int ibin = 1; ibin < maxbin; ibin++) {
 		x1 = h1 -> GetBinCenter(ibin - 1);
 		x2 = h1 -> GetBinCenter(ibin);
@@ -132,48 +132,56 @@ void BeamTiming::GetBeamTimings(TString dir, const int filetype, double threshol
 	}
 	rms /= maxbin;
 	rms = sqrt(rms);
-
+	
 	///////////////////////////////////////////////////////////////////////
-	// Find the beam timings and the number of bunhces
+	// Find the beam timings and the number of beams
 	///////////////////////////////////////////////////////////////////////
 	int binx1, binx2;
 	for (int ibin = 0; ibin < maxbin - 1; ibin++) {
-		x1 = h1_diff -> GetBinCenter(ibin);
-		x2 = h1_diff -> GetBinCenter(ibin + 1);
-		y1 = h1_diff -> GetBinContent(ibin);
-		y2 = h1_diff -> GetBinContent(ibin + 1);
-		binx1 = h1_diff -> GetBin(ibin);
-		binx2 = h1_diff -> GetBin(ibin + 1);
+		binx1 = ibin;
+		binx2 = ibin + 1;
 
+		x1 = h1_diff -> GetBinCenter(binx1);
+		y1 = h1_diff -> GetBinContent(binx1);
+		
 		if ( x1 - timings.at(timings.size() - 1) > 100 && y1 > threshold * rms ) { 
-			int ix1 = ibin;
-			int ix2 = ibin + 1;
-			int iy1 = h1_diff -> GetBinContent(ix1);
-			int iy2 = h1_diff -> GetBinContent(ix2);
-			double max = ix1;
+			int iy1 = h1 -> GetBinContent(binx1);
+			int iy2 = h1 -> GetBinContent(binx2);
+			double max = binx1;
 
-			// if iy2 < 0, set max = ix1
-			// if iy2 > 0 and iy2 > iy1, set max = ix2
-			while (iy2 > 0) {
-				iy1 = h1_diff -> GetBinContent(ix1);
-				iy2 = h1_diff -> GetBinContent(ix2);
+			double sum = 0;
+			while ( iy2 > h1 -> GetBinContent(max) / 3 ) { 
+				y1 = h1_diff -> GetBinContent(binx1);
+				y2 = h1_diff -> GetBinContent(binx2);
 
-				y1 = h1 -> GetBinContent(ix1);
-				y2 = h1 -> GetBinContent(ix2);
+				iy1 = h1 -> GetBinContent(binx1);
+				iy2 = h1 -> GetBinContent(binx2);
 
-				if (y1 < y2) { max = ix2;}
-
-				ix1 += 1;
-				ix2 += 1;
-			}	
+				if ( h1 -> GetBinContent(max) < iy2 ) { max = binx2; }
+				//cout << y1 << " | " << y2 << " | " << iy1 << " | " << iy2 << " | " << endl;
+				binx1 += 1;
+				binx2 += 1;
+			}
+			if (h1 -> GetBinContent(max) < 10) { continue; }
 			timings.push_back(h1_diff->GetBinCenter(max));
 			counts.push_back(h1->GetBinContent(max));
 		}
 	}
 
-	//cout << Form("%zu beam timings are found", timing.size() - 1) << endl;
-	h1 -> Draw();
-	for (int ibeam = 1; ibeam < timings.size(); ibeam++){
+	// Exclude low entry peaks
+    int maxcnt = *std::max_element(counts.begin(), counts.end());
+	for (size_t i = 0; i < counts.size();) {
+        if (counts[i] <= maxcnt / 2) {
+            counts.erase(counts.begin() + i);
+            timings.erase(timings.begin() + i);
+        } else {
+            ++i; 
+        }
+    }
+
+	nBeams = timings.size();
+	if ( figures ) { h1 -> Draw(); }
+	for (int ibeam = 0; ibeam < timings.size(); ibeam++){
 		TF1 *f1 = new TF1("f1", "gaus", timings.at(ibeam) - 100, timings.at(ibeam) + 100);
 		h1 -> Fit("f1", "RQ+");
 		double mean = f1 -> GetParameter(1);
@@ -194,21 +202,18 @@ void BeamTiming::GetBeamTimings(TString dir, const int filetype, double threshol
 		}
 		delete f1;
 	}
-	
-	timings.erase(timings.begin());
-	nBeams = timings.size();
 
 	for (int ibeam = 0; ibeam < timings.size(); ibeam++) {
 		if ( arisings . at(ibeam) > timings . at(ibeam) || fallings . at(ibeam) < timings . at(ibeam) || arisings . at(ibeam) < 0 || fallings . at(ibeam) < 0 || arisings . at(ibeam) > 4096 || fallings .at(ibeam) > 4500 ) {
-			std::cerr << "Error : Wrong rising (or falling) timing. Check that large pulses are collected enough." << std::endl; break;
+			std::cerr << "Error : Wrong rising (or falling) timing. Check that large pulses are appropriately collected." << std::endl; break;
 		}
 	}
 
-	h1 -> SetTitle(Form("%s nBeams : %i", rundir.Data(), nBeams));
-	c1 -> Update();
-	
-	if ( figures ) { c1 -> SaveAs(Form("./beamtiming_%s.png", rundir.Data()), "png"); } 
-	
+	if ( figures ) { 
+		h1 -> SetTitle(Form("%s nBeams : %i, maxcounts : %.f", rundir.Data(), nBeams, *std::max_element(counts.begin(), counts.end())));
+		c1 -> Update();
+		c1 -> SaveAs(Form("./beamtiming_%s.png", rundir.Data()), "png"); 
+	} 
 	delete c1;
 	delete h1;
 	delete h1_diff;
@@ -219,19 +224,19 @@ void BeamTiming::GetBeamTimings(TString dir, const int filetype, double threshol
 }
 
 void BeamTiming::GetBeamTimings(TString dir, const int filetype, bool figures) {
-	GetBeamTimings(dir, filetype, 1, figures);
+	GetBeamTimings(dir, filetype, 3, figures);
 }
 
 void BeamTiming::GetBeamTimings(TString dir, const int filetype) {
-	GetBeamTimings(dir, filetype, 1, false);
+	GetBeamTimings(dir, filetype, 3, false);
 }
 
 void BeamTiming::GetBeamTimings(TString dir, bool figures) {
-	GetBeamTimings(dir, 1, 1, figures);
+	GetBeamTimings(dir, 1, 3, figures);
 }
 
 void BeamTiming::GetBeamTimings(TString dir) {
-	GetBeamTimings(dir, 1, 1, false);
+	GetBeamTimings(dir, 1, 3, false);
 };
 
 
