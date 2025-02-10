@@ -1,3 +1,29 @@
+# Useful Results
+
+## Initial beam timings as a function of trigger delay 
+### (Initial beam timing) = - 817.65 $\times$ (Trigger delay) + 29913
+
+<img width="501" alt="Screenshot 2025-02-10 at 5 52 06 PM" src="https://github.com/user-attachments/assets/d6b94bb9-353a-45ea-aedf-fc34f7d0eada" />
+
+## Interval between two bunches
+### $\Delta t = 476.4 ± 4.52$ (TDC) or $\Delta t = 571.7 \pm 5.42$ (ns)
+<img width="419" alt="image" src="https://github.com/user-attachments/assets/776ae0d3-fb89-4db2-be87-c0eaa313cb04" />
+
+```
+```
+
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/65004863-3cc6-4660-aa7c-5844c3c11399" />
+<img width="489" alt="image" src="https://github.com/user-attachments/assets/cef6ec93-c567-460a-a5b6-b27d70bf8837" />
+
+## Bunch width
+### $\sigma_t = 167.52 \pm 7.373$ (ns) or $\sigma_t = 139.6 \pm 6.144$ (TDC) for $5 \sigma$ gaussian fit.
+<img width="320" alt="image" src="https://github.com/user-attachments/assets/37281336-619d-4803-baf6-98232f8f14f4" />
+
+```
+```
+<img width="673" alt="image" src="https://github.com/user-attachments/assets/eaa5b857-6ecd-4a41-bb9b-dbf428c56ea4" />
+
+
 # Requirement
 1. ROOT
 
