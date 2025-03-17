@@ -16,7 +16,7 @@
 <img width="489" alt="image" src="https://github.com/user-attachments/assets/cef6ec93-c567-460a-a5b6-b27d70bf8837" />
 
 ## Bunch width
-### $\sigma_t = 139.6 \pm 6.144$ (TDC) or $\sigma_t = 167.52 \pm 7.373$ (ns) for $5 \sigma$ gaussian fit.
+### $\sigma_t = 139.6 \pm 6.144$ (TDC) or $\sigma_t = 167.52 \pm 7.373$ (ns) for $10\sigma$ gaussian fit.
 <img width="320" alt="image" src="https://github.com/user-attachments/assets/37281336-619d-4803-baf6-98232f8f14f4" />
 
 ```
